@@ -8,12 +8,12 @@ import tkcalendar
 from schedule_scraper import ScheduleScraper
 
 # Set appearance mode in CustomTkinter (can be "System", "Dark" or "Light")
-ctk.set_appearance_mode("Dark")
+ctk.set_appearance_mode("System")
 ctk.set_default_color_theme("blue")
 
 
 class ScheduleScraperGUI:
-    """GUI application for downloading schedule using CustomTkinter."""
+    """GUI application for downloading schedule using CustomTkinter with dynamic light/dark theming."""
 
     def __init__(self):
         # Initialize the main window
@@ -23,6 +23,10 @@ class ScheduleScraperGUI:
         self.root.title("GrafikPlus")
         self.root.geometry("600x700")
         self.root.resizable(False, False)
+        self.root.after(201, lambda: self.root.iconbitmap('favicon.ico'))
+
+        # Setup theme colors based on the current appearance mode
+        self.theme_colors = self._get_theme_colors()
 
         # File to store the last used username
         self.last_username_file = Path.home() / '.schedule_scraper_user'
@@ -33,6 +37,30 @@ class ScheduleScraperGUI:
 
         # Load the last used username if available
         self._load_last_username()
+
+    @staticmethod
+    def _get_theme_colors():
+        """
+        Determines color settings based on the current appearance mode.
+        If the system is in Light mode, use lighter color palette; otherwise, use dark colors.
+        """
+        mode = ctk.get_appearance_mode()  # Expected to return "Light" or "Dark"
+        if mode == "Light":
+            return {
+                "main_bg": "#F0F0F0",
+                "section_bg": "#DADADA",
+                "button_download": "#90EE90",  # light green
+                "button_exit": "#FF7F7F",      # light red
+                "label_fg": "black"
+            }
+        else:
+            return {
+                "main_bg": "#3B3B3B",
+                "section_bg": "#4B4B4B",
+                "button_download": "#b0f090",
+                "button_exit": "#f09090",
+                "label_fg": "white"
+            }
 
     def _load_last_username(self):
         """Loads the last used username if the file exists."""
@@ -46,8 +74,8 @@ class ScheduleScraperGUI:
 
     def create_widgets(self):
         """Creates and configures all the GUI widgets."""
-        # Main frame with fixed margin
-        self.main_frame = ctk.CTkFrame(self.root, corner_radius=8, fg_color="#3B3B3B")
+        # Main frame with fixed margin using theme-specific background
+        self.main_frame = ctk.CTkFrame(self.root, corner_radius=8, fg_color=self.theme_colors["main_bg"])
         self.main_frame.pack(padx=20, pady=20, fill="both", expand=True)
 
         # Login section (credentials)
@@ -64,42 +92,52 @@ class ScheduleScraperGUI:
 
     def create_credentials_frame(self, parent):
         """Creates the section for entering login credentials."""
-        cred_frame = ctk.CTkFrame(parent, corner_radius=8, fg_color="#4B4B4B")
+        cred_frame = ctk.CTkFrame(parent, corner_radius=8, fg_color=self.theme_colors["section_bg"])
         cred_frame.pack(pady=(10, 15), fill="x", padx=10)
 
         # Section header label
-        cred_label = ctk.CTkLabel(cred_frame, text="Dane logowania", font=ctk.CTkFont(size=16, weight="bold"))
+        cred_label = ctk.CTkLabel(
+            cred_frame,
+            text="Dane logowania",
+            font=ctk.CTkFont(size=16, weight="bold"),
+            text_color=self.theme_colors["label_fg"]
+        )
         cred_label.pack(pady=(5, 10))
 
         # Frame for username input
-        username_frame = ctk.CTkFrame(cred_frame, fg_color="#4B4B4B", corner_radius=8)
+        username_frame = ctk.CTkFrame(cred_frame, fg_color=self.theme_colors["section_bg"], corner_radius=8)
         username_frame.pack(pady=5, fill="x", padx=10)
-        user_label = ctk.CTkLabel(username_frame, text="Nazwa użytkownika:")
+        user_label = ctk.CTkLabel(username_frame, text="Nazwa użytkownika:", text_color=self.theme_colors["label_fg"])
         user_label.pack(side="left", padx=(5, 10))
         self.username_entry = ctk.CTkEntry(username_frame, width=300)
         self.username_entry.pack(side="right", padx=(0, 5), pady=5)
 
         # Frame for password input
-        password_frame = ctk.CTkFrame(cred_frame, fg_color="#4B4B4B", corner_radius=8)
+        password_frame = ctk.CTkFrame(cred_frame, fg_color=self.theme_colors["section_bg"], corner_radius=8)
         password_frame.pack(pady=5, fill="x", padx=10)
-        pass_label = ctk.CTkLabel(password_frame, text="Hasło:")
+        pass_label = ctk.CTkLabel(password_frame, text="Hasło:", text_color=self.theme_colors["label_fg"])
         pass_label.pack(side="left", padx=(5, 10))
         self.password_entry = ctk.CTkEntry(password_frame, width=300, show="•")
         self.password_entry.pack(side="right", padx=(0, 5), pady=5)
 
     def create_output_frame(self, parent):
         """Creates the section for output file settings."""
-        output_frame = ctk.CTkFrame(parent, corner_radius=8, fg_color="#4B4B4B")
+        output_frame = ctk.CTkFrame(parent, corner_radius=8, fg_color=self.theme_colors["section_bg"])
         output_frame.pack(pady=(0, 15), fill="x", padx=10)
 
         # Section header label
-        output_label = ctk.CTkLabel(output_frame, text="Ustawienia pliku wyjściowego", font=ctk.CTkFont(size=16, weight="bold"))
+        output_label = ctk.CTkLabel(
+            output_frame,
+            text="Ustawienia pliku wyjściowego",
+            font=ctk.CTkFont(size=16, weight="bold"),
+            text_color=self.theme_colors["label_fg"]
+        )
         output_label.pack(pady=(5, 10))
 
         # Frame for directory selection
-        dir_frame = ctk.CTkFrame(output_frame, fg_color="#4B4B4B", corner_radius=8)
+        dir_frame = ctk.CTkFrame(output_frame, fg_color=self.theme_colors["section_bg"], corner_radius=8)
         dir_frame.pack(pady=5, fill="x", padx=10)
-        dir_label = ctk.CTkLabel(dir_frame, text="Zapisz w:")
+        dir_label = ctk.CTkLabel(dir_frame, text="Zapisz w:", text_color=self.theme_colors["label_fg"])
         dir_label.pack(side="left", padx=(5, 10))
         self.output_dir = tk.StringVar(value=str(Path.home() / "Downloads"))
         path_entry = ctk.CTkEntry(dir_frame, textvariable=self.output_dir, width=250)
@@ -108,9 +146,9 @@ class ScheduleScraperGUI:
         browse_btn.pack(side="right", padx=5, pady=5)
 
         # Frame for file name input
-        file_frame = ctk.CTkFrame(output_frame, fg_color="#4B4B4B", corner_radius=8)
+        file_frame = ctk.CTkFrame(output_frame, fg_color=self.theme_colors["section_bg"], corner_radius=8)
         file_frame.pack(pady=5, fill="x", padx=10)
-        file_label = ctk.CTkLabel(file_frame, text="Nazwa pliku:")
+        file_label = ctk.CTkLabel(file_frame, text="Nazwa pliku:", text_color=self.theme_colors["label_fg"])
         file_label.pack(side="left", padx=(5, 10))
         self.filename_entry = ctk.CTkEntry(file_frame, width=250)
         self.filename_entry.pack(side="left", padx=(0, 5), pady=5, fill="x", expand=True)
@@ -118,10 +156,15 @@ class ScheduleScraperGUI:
 
     def create_calendar_frame(self, parent):
         """Creates the date selection section using a calendar widget."""
-        cal_container = ctk.CTkFrame(parent, corner_radius=8, fg_color="#4B4B4B")
+        cal_container = ctk.CTkFrame(parent, corner_radius=8, fg_color=self.theme_colors["section_bg"])
         cal_container.pack(pady=(0, 5), fill="both", padx=10, expand=True)
 
-        cal_label = ctk.CTkLabel(cal_container, text="Wybierz dowolny dzień z DOCELOWEGO tygodnia:", font=ctk.CTkFont(size=16, weight="bold"))
+        cal_label = ctk.CTkLabel(
+            cal_container,
+            text="Wybierz dowolny dzień z DOCELOWEGO tygodnia:",
+            font=ctk.CTkFont(size=16, weight="bold"),
+            text_color=self.theme_colors["label_fg"]
+        )
         cal_label.pack(pady=(5, 10))
 
         # Embed tkcalendar.Calendar in a CustomTkinter frame
@@ -141,7 +184,7 @@ class ScheduleScraperGUI:
 
     def create_button_frame(self, parent):
         """Creates the section for action buttons."""
-        btn_frame = ctk.CTkFrame(parent, fg_color="#3B3B3B", corner_radius=8)
+        btn_frame = ctk.CTkFrame(parent, fg_color=self.theme_colors["main_bg"], corner_radius=8)
         btn_frame.pack(pady=(5, 5), fill="x", padx=10)
 
         download_button = ctk.CTkButton(
@@ -149,7 +192,7 @@ class ScheduleScraperGUI:
             text="Pobierz grafik",
             command=self.download_schedule,
             width=200,
-            fg_color="#b0f090",
+            fg_color=self.theme_colors["button_download"],
             text_color="black",
             font=ctk.CTkFont(size=16, weight="bold")
         )
@@ -160,7 +203,7 @@ class ScheduleScraperGUI:
             text="Wyjście",
             command=self.on_closing,
             width=200,
-            fg_color="#f09090",
+            fg_color=self.theme_colors["button_exit"],
             text_color="black",
             font=ctk.CTkFont(size=16, weight="bold")
         )
