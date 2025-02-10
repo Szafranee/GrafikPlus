@@ -4,7 +4,7 @@ This repository contains a work schedule scraper for CanalPlus using Python.
 
 ## Description
 
-The CanalPlus Schedule Scraper extracts and parses the schedule data from the Canal Plus website. It includes a GUI for easy interaction and scripts for scraping and parsing the schedules.
+The CanalPlus Schedule Scraper extracts and parses the schedule data from the CanalPlus website. It includes a GUI for easy interaction and scripts for scraping and parsing the schedules.
 
 ## Installation
 
@@ -21,5 +21,5 @@ pip install -r requirements.txt
 To launch the GUI, run:
 
 ```bash
-python gui.py
+python schedule_scraper_gui.py
 ```
