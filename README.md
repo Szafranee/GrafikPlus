@@ -1,1 +1,1 @@
-# canal-plus-schedule
+# canal-plus-schedule-scraper
