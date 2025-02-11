@@ -1,10 +1,10 @@
 import logging
-from dataclasses import dataclass
 from typing import Optional
 
 import requests
 
 from schedule_parser import ScheduleParser
+from config import ScheduleConfig, ScraperConfig
 
 # Configure logging
 logging.basicConfig(
@@ -17,29 +17,19 @@ logging.basicConfig(
 )
 
 
-@dataclass
-class ScraperConfig:
-    """Configuration storage class for web scraping operations"""
-    login_url: str = 'https://gpt.canalplus.pl/Account/Login'
-    schedule_url: str = 'https://gpt.canalplus.pl/Schedule/Editing'
-    parser: str = 'html.parser'
-    encoding: str = 'utf-8'
-    request_timeout: int = 30
-
-
 class ScheduleScraper:
-    def __init__(self, credentials):
+    def __init__(self, schedule_config: ScheduleConfig):
         self.config = ScraperConfig()
         self.session = requests.Session()
         self.schedule_data = []
-        self.credentials = credentials
+        self.schedule_config = schedule_config
 
     def __login(self) -> bool:
         """Perform login to the system"""
         try:
             payload = {
-                'username': self.credentials["username"],
-                'password': self.credentials["password"]
+                'username': self.schedule_config.username,
+                'password': self.schedule_config.password
             }
             response = self.session.post(
                 self.config.login_url,
@@ -62,9 +52,11 @@ class ScheduleScraper:
 
     def __fetch_schedule(self) -> Optional[str]:
         """Fetch schedule HTML content"""
+        schedule_url = self.config.personal_schedule_url if self.schedule_config.is_personal else self.config.general_schedule_url
+
         try:
             response = self.session.get(
-                self.config.schedule_url,
+                schedule_url,
                 timeout=self.config.request_timeout
             )
             response.raise_for_status()
@@ -85,8 +77,8 @@ class ScheduleScraper:
             logging.error("Failed to fetch schedule. Terminating program.")
             return False
 
-        parser = ScheduleParser(html_content, self.credentials)
+        parser = ScheduleParser(html_content, self.schedule_config)
         parser.parse_schedule()
         parser.save_to_csv()
-        logging.info(f"Schedule saved to {self.credentials["output_filename"]}")
+        logging.info(f"Schedule saved to {self.schedule_config.output_filename}")
         return True

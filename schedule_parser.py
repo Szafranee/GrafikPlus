@@ -6,12 +6,13 @@ from typing import List, Dict
 
 from bs4 import BeautifulSoup
 
+from config import ScheduleConfig
 
 class ScheduleParser:
-    def __init__(self, html_content: str, credentials):
+    def __init__(self, html_content: str, schedule_config: ScheduleConfig):
         self.soup = BeautifulSoup(html_content, 'html.parser')
         self.schedule_data = []
-        self.credentials = credentials
+        self.schedule_config = schedule_config
 
     @staticmethod
     def __calculate_duration(start_time: str, end_time: str) -> str:
@@ -26,12 +27,41 @@ class ScheduleParser:
         hours = duration.total_seconds() / 3600
         return f"{hours:.2f}"
 
+    @staticmethod
+    def __convert_date(date: str) -> str:
+        """Convert date to ISO format from dates like 'poniedziałek, 1 stycznia 2025'"""
+
+        date_parts = date.split(', ')
+
+        date_string = date_parts[1]
+        day, month, year = date_string.split(' ')
+
+        months = {
+            'stycznia': '01',
+            'lutego': '02',
+            'marca': '03',
+            'kwietnia': '04',
+            'maja': '05',
+            'czerwca': '06',
+            'lipca': '07',
+            'sierpnia': '08',
+            'września': '09',
+            'października': '10',
+            'listopada': '11',
+            'grudnia': '12'
+        }
+
+        month = months[month]
+
+        return f"{day}/{month}/{year}"
+
+
     def parse_schedule(self) -> List[Dict]:
         """Parse schedule data from HTML content"""
         sections = self.soup.find_all('th', class_='gpt-table-section-header')
 
         for section in sections:
-            date = section.text.strip()
+            date = self.__convert_date(section.text.strip())
 
             current_section = section.parent
             rows = current_section.find_next_siblings('tr')
@@ -58,9 +88,6 @@ class ScheduleParser:
                     start_time, end_time = times[0].replace('\n', ''), times[2].replace('\n', '')
                     duration = self.__calculate_duration(start_time, end_time)
 
-                    remarks_cell = row.find('pre', class_='gpt-pre-remarks')
-                    remarks = remarks_cell.text.strip() if remarks_cell else ""
-
                     editor = cells[11].text.strip()
 
                     self.schedule_data.append({
@@ -70,8 +97,7 @@ class ScheduleParser:
                         'start_time': start_time,
                         'end_time': end_time,
                         'duration': duration,
-                        'editor': editor,
-                        'remarks': remarks
+                        'editor': editor
                     })
                 except (AttributeError, IndexError) as e:
                     logging.warning(f"Error parsing row: {e}")
@@ -81,13 +107,13 @@ class ScheduleParser:
 
     def save_to_csv(self) -> None:
         """Save parsed schedule to CSV file"""
-        headers = ['Data', 'Program', 'Miejsce produkcji', 'Od', 'Do', 'Godziny', 'Montażysta', 'Uwagi']
+        headers = ['Data', 'Program', 'Miejsce produkcji', 'Od', 'Do', 'Godziny', 'Montażysta']
 
         # create output file path
-        output_file = self.credentials["output_dir"] + '/' + self.credentials["output_filename"]
+        output_file = self.schedule_config.get_full_output_path()
 
         # create directory if it doesn't exist
-        output_dir = Path(self.credentials["output_dir"])
+        output_dir = Path(self.schedule_config.output_dir)
         output_dir.mkdir(parents=True, exist_ok=True)
 
         with open(output_file, 'w', newline='', encoding='utf-8') as f:
@@ -103,5 +129,4 @@ class ScheduleParser:
                     entry['end_time'],
                     entry['duration'],
                     entry['editor'],
-                    entry['remarks']
                 ])

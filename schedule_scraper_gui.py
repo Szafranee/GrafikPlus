@@ -1,16 +1,17 @@
-import customtkinter as ctk
 import tkinter as tk
-from tkinter import filedialog, messagebox
 from datetime import datetime
 from pathlib import Path
+from tkinter import filedialog, messagebox
+
+import customtkinter as ctk
 import tkcalendar
 
+from config import ScheduleConfig
 from schedule_scraper import ScheduleScraper
 
 # Set appearance mode in CustomTkinter (can be "System", "Dark" or "Light")
 ctk.set_appearance_mode("System")
 ctk.set_default_color_theme("blue")
-
 
 class ScheduleScraperGUI:
     """GUI application for downloading schedule using CustomTkinter with dynamic light/dark theming."""
@@ -21,7 +22,7 @@ class ScheduleScraperGUI:
         self.scraper = None
         self.root = ctk.CTk()
         self.root.title("GrafikPlus")
-        self.root.geometry("600x700")
+        self.root.geometry("600x750")
         self.root.resizable(False, False)
         self.root.after(201, lambda: self.root.iconbitmap('favicon.ico'))
 
@@ -81,6 +82,9 @@ class ScheduleScraperGUI:
         # Login section (credentials)
         self.create_credentials_frame(self.main_frame)
 
+        # Schedule type selection section
+        self.create_schedule_selection_frame(self.main_frame)
+
         # Output file settings section
         self.create_output_frame(self.main_frame)
 
@@ -102,7 +106,7 @@ class ScheduleScraperGUI:
             font=ctk.CTkFont(size=16, weight="bold"),
             text_color=self.theme_colors["label_fg"]
         )
-        cred_label.pack(pady=(5, 10))
+        cred_label.pack(pady=(5, 0))
 
         # Frame for username input
         username_frame = ctk.CTkFrame(cred_frame, fg_color=self.theme_colors["section_bg"], corner_radius=8)
@@ -120,6 +124,45 @@ class ScheduleScraperGUI:
         self.password_entry = ctk.CTkEntry(password_frame, width=300, show="•")
         self.password_entry.pack(side="right", padx=(0, 5), pady=5)
 
+    def create_schedule_selection_frame(self, parent):
+        """Creates the section for selecting the schedule type."""
+        sel_frame = ctk.CTkFrame(parent, corner_radius=8, fg_color=self.theme_colors["section_bg"])
+        sel_frame.pack(pady=(0, 15), fill="x", padx=10)
+
+        # Section header label
+        sel_label = ctk.CTkLabel(
+            sel_frame,
+            text="Wybierz grafik",
+            font=ctk.CTkFont(size=16, weight="bold"),
+            text_color=self.theme_colors["label_fg"]
+        )
+        sel_label.pack(pady=(5, 0))
+
+        # Frame for radio button
+        radio_frame = ctk.CTkFrame(sel_frame, fg_color=self.theme_colors["section_bg"], corner_radius=8)
+        radio_frame.pack(pady=5, fill="x", padx=10)
+
+        self.schedule_type = tk.IntVar(value=0)
+
+        general_radio = ctk.CTkRadioButton(
+            radio_frame,
+            text="Grafik montaży",
+            variable=self.schedule_type,
+            value=0,
+            text_color=self.theme_colors["label_fg"]
+        )
+        general_radio.pack(side="left", padx=(75, 5), pady=5)
+
+        personal_radio = ctk.CTkRadioButton(
+            radio_frame,
+            text="Grafik użytkownika",
+            variable=self.schedule_type,
+            value=1,
+            text_color=self.theme_colors["label_fg"]
+        )
+        personal_radio.pack(side="right", padx=(5, 75), pady=5)
+
+
     def create_output_frame(self, parent):
         """Creates the section for output file settings."""
         output_frame = ctk.CTkFrame(parent, corner_radius=8, fg_color=self.theme_colors["section_bg"])
@@ -132,7 +175,7 @@ class ScheduleScraperGUI:
             font=ctk.CTkFont(size=16, weight="bold"),
             text_color=self.theme_colors["label_fg"]
         )
-        output_label.pack(pady=(5, 10))
+        output_label.pack(pady=(5, 0))
 
         # Frame for directory selection
         dir_frame = ctk.CTkFrame(output_frame, fg_color=self.theme_colors["section_bg"], corner_radius=8)
@@ -165,7 +208,7 @@ class ScheduleScraperGUI:
             font=ctk.CTkFont(size=16, weight="bold"),
             text_color=self.theme_colors["label_fg"]
         )
-        cal_label.pack(pady=(5, 10))
+        cal_label.pack(pady=(5, 0))
 
         # Embed tkcalendar.Calendar in a CustomTkinter frame
         self.calendar = tkcalendar.Calendar(
@@ -243,14 +286,16 @@ class ScheduleScraperGUI:
         except Exception:
             pass
 
-        credentials = {
-            "username": username,
-            "password": password,
-            "output_dir": self.output_dir.get(),
-            "output_filename": self.filename_entry.get(),
-            "selected_date": self.calendar.get_date()
-        }
+        credentials = ScheduleConfig(
+            username=username,
+            password=password,
+            output_dir=self.output_dir.get(),
+            output_filename=self.filename_entry.get(),
+            selected_date=self.calendar.get_date(),
+            is_personal=self.schedule_type.get() == 1
+        )
 
+        # TODO: Remove this line after testing
         print(credentials)
 
         # Initialize the scraper
