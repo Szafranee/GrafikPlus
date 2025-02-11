@@ -5,3 +5,4 @@ lxml>=4.9.0
 python-dotenv>=0.19.0
 tkcalendar>=1.6.1
 ttkthemes>=3.2.2
+customtkinter>=5.2.2
