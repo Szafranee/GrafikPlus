@@ -1,9 +1,11 @@
 import csv
 import logging
+import tempfile
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import List, Dict, Optional
 
+import pandas as pd
 from bs4 import BeautifulSoup
 
 from config import ScheduleConfig
@@ -182,35 +184,38 @@ class ScheduleParser:
         else:
             self.parse_general_schedule()
 
-    def save_to_csv(self) -> None:
-        """Save parsed schedule to CSV file"""
+    def save_to_xlsx(self) -> None:
+        """Save parsed schedule to Excel file with improved file handling"""
         headers = ['Data', 'Program', 'Od', 'Do', 'Godziny'] if self.schedule_config.is_personal \
             else ['Data', 'Program', 'Od', 'Do', 'Godziny', 'Montażysta']
 
-        output_file = self.schedule_config.get_full_output_path()
+        output_file_path = self.schedule_config.get_full_output_path()
         output_dir = Path(self.schedule_config.output_dir)
         output_dir.mkdir(parents=True, exist_ok=True)
 
-        with open(output_file, 'w', newline='', encoding='utf-8') as f:
-            writer = csv.writer(f, delimiter=';')
-            writer.writerow(headers)
+        # Create DataFrame directly instead of using temporary CSV
+        data = []
+        for entry in self.schedule_data:
+            row = [
+                entry['date'],
+                entry['program'],
+                entry['start_time'],
+                entry['end_time'],
+                entry['duration']
+            ]
+            if not self.schedule_config.is_personal:
+                row.append(entry['editor'])
+            data.append(row)
 
-            if self.schedule_config.is_personal:
-                for entry in self.schedule_data:
-                    writer.writerow([
-                        entry['date'],
-                        entry['program'],
-                        entry['start_time'],
-                        entry['end_time'],
-                        entry['duration'],
-                    ])
-            else:
-                for entry in self.schedule_data:
-                    writer.writerow([
-                        entry['date'],
-                        entry['program'],
-                        entry['start_time'],
-                        entry['end_time'],
-                        entry['duration'],
-                        entry['editor'],
-                    ])
+        df = pd.DataFrame(data, columns=headers)
+
+        try:
+            df.to_excel(output_file_path, index=False)
+        except PermissionError:
+            logging.error(f"Permission denied when saving to {output_file_path}")
+            raise
+        except Exception as e:
+            logging.error(f"Error saving Excel file: {str(e)}")
+            raise
+        finally:
+            logging.info(f"Schedule saved to {output_file_path}")

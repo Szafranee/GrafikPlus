@@ -13,6 +13,7 @@ from schedule_scraper import ScheduleScraper
 ctk.set_appearance_mode("System")
 ctk.set_default_color_theme("blue")
 
+
 class ScheduleScraperGUI:
     """GUI application for downloading schedule using CustomTkinter with dynamic light/dark theming."""
 
@@ -51,7 +52,7 @@ class ScheduleScraperGUI:
                 "main_bg": "#F0F0F0",
                 "section_bg": "#DADADA",
                 "button_download": "#90EE90",  # light green
-                "button_exit": "#FF7F7F",      # light red
+                "button_exit": "#FF7F7F",  # light red
                 "label_fg": "black"
             }
         else:
@@ -162,7 +163,6 @@ class ScheduleScraperGUI:
         )
         personal_radio.pack(side="right", padx=(5, 75), pady=5)
 
-
     def create_output_frame(self, parent):
         """Creates the section for output file settings."""
         output_frame = ctk.CTkFrame(parent, corner_radius=8, fg_color=self.theme_colors["section_bg"])
@@ -195,7 +195,7 @@ class ScheduleScraperGUI:
         file_label.pack(side="left", padx=(5, 10))
         self.filename_entry = ctk.CTkEntry(file_frame, width=250)
         self.filename_entry.pack(side="left", padx=(0, 5), pady=5, fill="x", expand=True)
-        self.filename_entry.insert(0, "grafik.csv")
+        self.filename_entry.insert(0, "grafik.xlsx")
 
     def create_calendar_frame(self, parent):
         """Creates the date selection section using a calendar widget."""
@@ -306,7 +306,8 @@ class ScheduleScraperGUI:
         if scraped:
             self.show_success_message()
         else:
-            messagebox.showerror("Error", "Wystąpił błąd podczas pobierania grafiku.\nSprawdź dane logowania i spróbuj ponownie.")
+            messagebox.showerror("Error",
+                                 "Wystąpił błąd podczas pobierania grafiku.\nSprawdź dane logowania i spróbuj ponownie.")
 
     def on_closing(self):
         """Handles application closing."""

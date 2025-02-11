@@ -3,8 +3,8 @@ from typing import Optional
 
 import requests
 
-from schedule_parser import ScheduleParser
 from config import ScheduleConfig, ScraperConfig
+from schedule_parser import ScheduleParser
 
 # Configure logging
 logging.basicConfig(
@@ -23,6 +23,12 @@ class ScheduleScraper:
         self.session = requests.Session()
         self.schedule_data = []
         self.schedule_config = schedule_config
+
+    @staticmethod
+    def __convert_date_to_url_format(date: str) -> str:
+        """Convert date to URL format from dates like '01/01/2025'"""
+        day, month, year = date.split('.')
+        return f"{month}%2F{day}%2F{year}%2000%3A00%3A00"
 
     def __login(self) -> bool:
         """Perform login to the system"""
@@ -54,6 +60,10 @@ class ScheduleScraper:
         """Fetch schedule HTML content"""
         schedule_url = self.config.personal_schedule_url if self.schedule_config.is_personal else self.config.general_schedule_url
 
+        date_url = self.__convert_date_to_url_format(self.schedule_config.selected_date)
+
+        schedule_url += f"?date={date_url}"  # Add date to URL
+
         try:
             response = self.session.get(
                 schedule_url,
@@ -82,6 +92,6 @@ class ScheduleScraper:
         # Calls the appropriate parsing method based on the schedule type from the config
         parser.parse_schedule()
 
-        parser.save_to_csv()
+        parser.save_to_xlsx()
         logging.info(f"Schedule saved to {self.schedule_config.output_filename}")
         return True
