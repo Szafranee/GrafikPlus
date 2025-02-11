@@ -78,7 +78,10 @@ class ScheduleScraper:
             return False
 
         parser = ScheduleParser(html_content, self.schedule_config)
+
+        # Calls the appropriate parsing method based on the schedule type from the config
         parser.parse_schedule()
+
         parser.save_to_csv()
         logging.info(f"Schedule saved to {self.schedule_config.output_filename}")
         return True
