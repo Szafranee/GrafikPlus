@@ -135,7 +135,6 @@ class ScheduleParser:
                 continue
 
             try:
-                # Find program name from the nested table structure
                 program_table = row.find('td')
                 if not program_table:
                     continue
@@ -150,7 +149,6 @@ class ScheduleParser:
 
                 program = program_cell.text.strip()
 
-                # Find time information
                 time_cell = row.find('span', class_='text-bold')
                 if not time_cell:
                     continue
@@ -193,7 +191,7 @@ class ScheduleParser:
         output_dir = Path(self.schedule_config.output_dir)
         output_dir.mkdir(parents=True, exist_ok=True)
 
-        # Create DataFrame directly instead of using temporary CSV
+        # create DataFrame from parsed data and save to Excel
         data = []
         for entry in self.schedule_data:
             row = [

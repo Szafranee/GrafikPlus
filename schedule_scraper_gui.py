@@ -210,7 +210,6 @@ class ScheduleScraperGUI:
         )
         cal_label.pack(pady=(5, 0))
 
-        # Embed tkcalendar.Calendar in a CustomTkinter frame
         self.calendar = tkcalendar.Calendar(
             cal_container,
             selectmode="day",
