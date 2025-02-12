@@ -226,9 +226,12 @@ class ScheduleScraperGUI:
         file_frame.pack(pady=5, fill="x", padx=10)
         file_label = ctk.CTkLabel(file_frame, text="Nazwa pliku:", text_color=self.theme_colors["label_fg"])
         file_label.pack(side="left", padx=(5, 10))
+        file_extension_label = ctk.CTkLabel(file_frame, text=".xlsx", text_color=self.theme_colors["label_fg"])
+        file_extension_label.pack(side="right", padx=(0, 5))
+
         self.filename_entry = ctk.CTkEntry(file_frame, width=250)
         self.filename_entry.pack(side="left", padx=(0, 5), pady=5, fill="x", expand=True)
-        self.filename_entry.insert(0, "grafik.xlsx")
+        self.filename_entry.insert(0, "grafik")
 
     def create_calendar_frame(self, parent):
         """Creates the date selection section using a calendar widget."""
@@ -318,17 +321,15 @@ class ScheduleScraperGUI:
         except Exception:
             pass
 
+
         credentials = ScheduleConfig(
             username=username,
             password=password,
             output_dir=self.output_dir.get(),
-            output_filename=self.filename_entry.get(),
+            output_filename=self.filename_entry.get() if self.filename_entry.get().endswith(".xlsx") else self.filename_entry.get() + ".xlsx",
             selected_date=self.calendar.get_date(),
             is_personal=self.schedule_type.get() == 1
         )
-
-        # TODO: Remove this line after testing
-        print(credentials)
 
         # Initialize the scraper
         self.scraper = ScheduleScraper(credentials)
