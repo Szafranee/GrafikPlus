@@ -7,7 +7,7 @@ A simple GUI application for downloading work schedules from the CanalPlus inter
 ## Quick start
 
 ### Users
-1. Download the latest version of the program from the [Releases](../../releases) tab 
+1. Download the latest version of the program [here](https://github.com/Szafranee/GrafikPlus/releases/download/v1.0.0/GrafikPlus.exe) or from the [Releases](../../releases) tab
 2. Run `GrafikPlus.exe`
 3. Enter your login details 
 4. Choose the type of schedule and the save location 
