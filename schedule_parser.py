@@ -1,6 +1,5 @@
-import csv
 import logging
-import tempfile
+import numbers
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import List, Dict, Optional
@@ -18,7 +17,7 @@ class ScheduleParser:
         self.schedule_config = schedule_config
 
     @staticmethod
-    def __calculate_duration(start_time: str, end_time: str) -> str:
+    def __calculate_duration(start_time: str, end_time: str) -> float:
         """Calculate duration between two times, handling day changes"""
         start = datetime.strptime(start_time, '%H:%M')
         end = datetime.strptime(end_time, '%H:%M')
@@ -28,7 +27,7 @@ class ScheduleParser:
 
         duration = end - start
         hours = duration.total_seconds() / 3600
-        return f"{hours:.2f}"
+        return round(hours, 2)
 
     @staticmethod
     def __convert_date(date: str) -> str:
@@ -183,7 +182,7 @@ class ScheduleParser:
             self.parse_general_schedule()
 
     def save_to_xlsx(self) -> None:
-        """Save parsed schedule to Excel file with improved file handling"""
+        """Save parsed schedule to Excel file with proper Polish locale handling"""
         headers = ['Data', 'Program', 'Od', 'Do', 'Godziny'] if self.schedule_config.is_personal \
             else ['Data', 'Program', 'Od', 'Do', 'Godziny', 'Montażysta']
 
@@ -191,7 +190,7 @@ class ScheduleParser:
         output_dir = Path(self.schedule_config.output_dir)
         output_dir.mkdir(parents=True, exist_ok=True)
 
-        # create DataFrame from parsed data and save to Excel
+        # Prepare data for DataFrame
         data = []
         for entry in self.schedule_data:
             row = [
@@ -199,7 +198,7 @@ class ScheduleParser:
                 entry['program'],
                 entry['start_time'],
                 entry['end_time'],
-                entry['duration']
+                float(entry['duration'])
             ]
             if not self.schedule_config.is_personal:
                 row.append(entry['editor'])
@@ -208,12 +207,50 @@ class ScheduleParser:
         df = pd.DataFrame(data, columns=headers)
 
         try:
-            df.to_excel(output_file_path, index=False)
+            writer = pd.ExcelWriter(
+                output_file_path,
+                engine='openpyxl'
+            )
+
+            # Save DataFrame to Excel
+            df.to_excel(writer, index=False)
+
+            # Access the sheet
+            worksheet = writer.sheets['Sheet1']
+
+            # Formating the hours column
+            col_idx = headers.index('Godziny') + 1
+            for row in range(2, len(df) + 2):
+                cell = worksheet.cell(row=row, column=col_idx)
+                # Format the cell as number with two decimal places
+                cell.number_format = '#,##0.00'
+
+                # We make sure that the value is a float
+                try:
+                    cell.value = float(cell.value)
+                except (ValueError, TypeError):
+                    logging.warning(f"Could not convert value {cell.value} to float")
+
+            # Adjust column widths
+            for idx, col in enumerate(worksheet.columns, 1):
+                max_length = 0
+                column = worksheet.column_dimensions[chr(64 + idx)]
+
+                for cell in col:
+                    try:
+                        max_length = max(max_length, len(str(cell.value)))
+                    except TypeError:
+                        pass
+
+                adjusted_width = (max_length + 2)
+                column.width = adjusted_width
+
+            writer.close()
+            logging.info(f"Schedule saved successfully to {output_file_path}")
+
         except PermissionError:
             logging.error(f"Permission denied when saving to {output_file_path}")
             raise
         except Exception as e:
             logging.error(f"Error saving Excel file: {str(e)}")
             raise
-        finally:
-            logging.info(f"Schedule saved to {output_file_path}")
