@@ -1,3 +1,5 @@
+import os
+import sys
 import tkinter as tk
 from datetime import datetime
 from pathlib import Path
@@ -27,6 +29,9 @@ class ScheduleScraperGUI:
         self.root.resizable(False, False)
         self.root.after(201, lambda: self.root.iconbitmap('favicon.ico'))
 
+        # Set icon before any other GUI operations
+        self.set_window_icon()
+
         # Setup theme colors based on the current appearance mode
         self.theme_colors = self._get_theme_colors()
 
@@ -39,6 +44,34 @@ class ScheduleScraperGUI:
 
         # Load the last used username if available
         self._load_last_username()
+
+    def set_window_icon(self):
+        """Set window icon with proper resource path handling for both development and compiled modes."""
+        try:
+            # Set Windows taskbar icon
+            if os.name == 'nt':
+                import ctypes
+                myappid = 'company.grafikplus.schedule.1.0'
+                ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+
+            # Get the icon path
+            if getattr(sys, 'frozen', False):
+                # Running as compiled exe
+                base_path = sys._MEIPASS
+            else:
+                # Running from Python interpreter
+                base_path = os.path.dirname(os.path.abspath(__file__))
+
+            icon_path = os.path.join(base_path, 'favicon.ico')
+
+            if os.path.exists(icon_path):
+                self.root.iconbitmap(icon_path)
+            else:
+                print(f"Warning: Icon file not found at {icon_path}")
+
+        except Exception as e:
+            print(f"Warning: Could not set window icon: {e}")
+            # Fail silently - the application can still run without an icon
 
     @staticmethod
     def _get_theme_colors():
