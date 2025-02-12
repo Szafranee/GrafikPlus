@@ -1,0 +1,64 @@
+# GrafikPlus
+
+A simple GUI application for downloading work schedules from the CanalPlus internal system.
+
+[Wersja polska](README.md)
+
+## Quick start
+
+### Users
+1. Download the latest version of the program from the [Releases](../../releases) tab
+2. Unpack the `GrafikPlus.zip` file
+3. Run `GrafikPlus.exe`
+4. Enter your login details
+5. Choose the type of schedule and the save location
+6. Click "Download schedule"
+7. Done!
+
+### Developers
+```bash
+git clone
+cd grafikplus
+pip install -r requirements.txt
+python schedule_scraper_gui.py
+```
+
+## Features
+- Download general and personal schedules
+- Week selection via calendar
+- Auto-save last used username
+- Customizable output location and filename
+- Light/dark mode (system-aware)
+
+## System requirements
+- Windows 10/11
+- Access to a CanalPlus employee account
+
+## Troubleshooting
+
+### Login error
+- Verify your credentials
+- Make sure you're connected to the Internet
+
+### File saving issues
+- Check write permissions in the selected directory
+- Make sure the file isn't open in another program
+
+## Technical Details
+
+### Technologies
+- Python 3.8+
+- CustomTkinter (UI)
+- BeautifulSoup4 (parsing)
+- Requests (data fetching)
+- Pandas (Excel export)
+
+### Project Structure
+```
+grafikplus/
+├── schedule_scraper_gui.py   # Main application file
+├── schedule_scraper.py       # Scraping logic
+├── schedule_parser.py        # HTML parsing
+├── config.py                # Configuration
+└── requirements.txt         # Dependencies
+```

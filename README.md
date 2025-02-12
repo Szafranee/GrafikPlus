@@ -1,25 +1,63 @@
-# CanalPlus Work Schedule Scraper
+# GrafikPlus
 
-This repository contains a work schedule scraper for CanalPlus using Python.
+Program do pobierania grafików z systemu CanalPlus z prostym interfejsem graficznym.
 
-## Description
+[English version](README_EN.md)
 
-The CanalPlus Schedule Scraper extracts and parses the schedule data from the CanalPlus website. It includes a GUI for easy interaction and scripts for scraping and parsing the schedules.
+## Szybki start
 
-## Installation
+### Użytkownicy
+1. Pobierz najnowszą wersję programu z zakładki [Releases](../../releases)
+2. Rozpakuj plik `GrafikPlus.zip`
+3. Uruchom `GrafikPlus.exe`
+4. Wprowadź dane logowania
+5. Wybierz typ grafiku i lokalizację zapisu
+6. Kliknij "Pobierz grafik"
 
-To install the required dependencies, run:
-
+### Programiści
 ```bash
+git clone https://github.com/yourusername/grafikplus.git
+cd grafikplus
 pip install -r requirements.txt
+python schedule_scraper_gui.py
 ```
 
-## Usage
+## Funkcje
+- Pobieranie grafiku montaży oraz grafików osobistych
+- Wybór tygodnia przez kalendarz
+- Automatyczne zapisywanie ostatnio użytej nazwy użytkownika
+- Możliwość wyboru lokalizacji i nazwy pliku wyjściowego
+- Tryb jasny/ciemny (zgodny z ustawieniami systemu)
+- 
+## Wymagania systemowe
+- Windows 10/11
+- Dostęp do konta pracowniczego CanalPlus
 
-### GUI
+## Rozwiązywanie problemów
 
-To launch the GUI, run:
+### Błąd logowania
+- Sprawdź poprawność danych logowania
+- Upewnij się, że masz połączenie z Internetem
 
-```bash
-python schedule_scraper_gui.py
+### Problemy z zapisem pliku
+- Sprawdź uprawnienia do zapisu w wybranym katalogu
+- Upewnij się, że plik nie jest otwarty w innym programie 
+
+## Informacje techniczne
+
+### Użyte technologie
+- Python 3.8+ 
+- CustomTkinter (interfejs)
+- BeautifulSoup4 (parsowanie)
+- Requests (pobieranie danych)
+- Pandas (eksport do Excel)
+
+### Struktura projektu
+```
+grafikplus/
+├── schedule_scraper_gui.py   # Główny plik aplikacji
+├── schedule_scraper.py       # Logika pobierania danych
+├── schedule_parser.py        # Parsowanie HTML
+├── config.py                # Konfiguracja
+└── requirements.txt         # Zależności
 ```
