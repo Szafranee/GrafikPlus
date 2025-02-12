@@ -7,7 +7,7 @@ Program do pobierania grafików z systemu CanalPlus z prostym interfejsem grafic
 ## Szybki start
 
 ### Użytkownicy
-1. Pobierz najnowszą wersję programu [tutaj](https://github.com/Szafranee/GrafikPlus/releases/download/v1.0.0/GrafikPlus.exe) albo z zakładki [Releases](../../releases)
+1. Pobierz najnowszą wersję programu [tutaj](https://github.com/Szafranee/GrafikPlus/releases/download/v1.1.0/GrafikPlus.exe) albo z zakładki [Releases](../../releases)
 2. Uruchom `GrafikPlus.exe`
 3. Wprowadź dane logowania 
 4. Wybierz typ grafiku i lokalizację zapisu 
