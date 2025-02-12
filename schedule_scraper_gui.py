@@ -218,7 +218,7 @@ class ScheduleScraperGUI:
         self.output_dir = tk.StringVar(value=str(Path.home() / "Downloads"))
         path_entry = ctk.CTkEntry(dir_frame, textvariable=self.output_dir, width=250)
         path_entry.pack(side="left", padx=(0, 5), pady=5, fill="x", expand=True)
-        browse_btn = ctk.CTkButton(dir_frame, text="Browse", command=self.browse_output, width=120)
+        browse_btn = ctk.CTkButton(dir_frame, text="Przeglądaj", command=self.browse_output, width=120)
         browse_btn.pack(side="right", padx=5, pady=5)
 
         # Frame for file name input
