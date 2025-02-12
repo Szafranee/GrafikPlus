@@ -1,5 +1,4 @@
 import logging
-import numbers
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import List, Dict, Optional
@@ -52,7 +51,7 @@ class ScheduleParser:
         }
 
         month = months[month]
-        return f"{day}/{month}/{year}"
+        return f"{day}.{month}.{year}"
 
     @staticmethod
     def __is_date_row(row) -> bool:
@@ -250,7 +249,9 @@ class ScheduleParser:
 
         except PermissionError:
             logging.error(f"Permission denied when saving to {output_file_path}")
-            raise
+            raise PermissionError({"title": "Błąd w dostępie do pliku!",
+                                   "message": f"Brak uprawnień do zapisu pliku: \nSprawdź, czy {output_file_path} nie jest otwarty w innym programie."})
         except Exception as e:
             logging.error(f"Error saving Excel file: {str(e)}")
-            raise
+            raise Exception({"title": "Nieznany błąd zapisu pliku!",
+                             "message": "Coś poszło nie tak podczas zapisu pliku. Spróbuj ponownie."})

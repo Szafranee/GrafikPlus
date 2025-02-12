@@ -312,7 +312,7 @@ class ScheduleScraperGUI:
 
         # Validate login credentials
         if not username or not password:
-            messagebox.showerror("Błąd walidacji", "Nazwa użytkownika i hasło nie mogą być puste!")
+            self.show_error_message("Błąd walidacji", "Nazwa użytkownika i hasło nie mogą być puste!")
             return
 
         # Save the last used username
@@ -321,12 +321,12 @@ class ScheduleScraperGUI:
         except Exception:
             pass
 
-
         credentials = ScheduleConfig(
             username=username,
             password=password,
             output_dir=self.output_dir.get(),
-            output_filename=self.filename_entry.get() if self.filename_entry.get().endswith(".xlsx") else self.filename_entry.get() + ".xlsx",
+            output_filename=self.filename_entry.get() if self.filename_entry.get().endswith(
+                ".xlsx") else self.filename_entry.get() + ".xlsx",
             selected_date=self.calendar.get_date(),
             is_personal=self.schedule_type.get() == 1
         )
@@ -335,12 +335,15 @@ class ScheduleScraperGUI:
         self.scraper = ScheduleScraper(credentials)
 
         # Download the schedule
-        scraped = self.scraper.scrape_schedule()
-        if scraped:
-            self.show_success_message()
-        else:
-            messagebox.showerror("Error",
-                                 "Wystąpił błąd podczas pobierania grafiku.\nSprawdź dane logowania i spróbuj ponownie.")
+        try:
+            self.scraper.scrape_schedule()
+        except Exception as e:
+            details = e.args[0]
+            self.show_error_message(details["title"], details["message"])
+            return
+
+        self.show_success_message("Pobieranie zakończone", "Pobieranie grafiku zakończone pomyślnie! \nZnajdziesz go w wybranym wcześniej katalogu.")
+
 
     def on_closing(self):
         """Handles application closing."""
@@ -352,9 +355,14 @@ class ScheduleScraperGUI:
         self.root.mainloop()
 
     @staticmethod
-    def show_success_message():
+    def show_success_message(title: str, message: str):
         """Displays a success message after a successful download."""
-        messagebox.showinfo("Sukces", "Grafik pobrany pomyślnie.\nZnajdziesz go w wybranym katalogu.")
+        messagebox.showinfo(title, message)
+
+    @staticmethod
+    def show_error_message(title: str, message: str):
+        """Displays an error message."""
+        messagebox.showerror(title, message)
 
 
 if __name__ == "__main__":

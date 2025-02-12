@@ -17,6 +17,16 @@ logging.basicConfig(
 )
 
 
+class LoginError(Exception):
+    """Raised when login fails"""
+    pass
+
+
+class ScheduleFetchError(Exception):
+    """Raised when fetching schedule fails"""
+    pass
+
+
 class ScheduleScraper:
     def __init__(self, schedule_config: ScheduleConfig):
         self.config = ScraperConfig()
@@ -75,23 +85,29 @@ class ScheduleScraper:
             logging.error(f"Error fetching schedule: {e}")
             return None
 
-    def scrape_schedule(self) -> bool:
+    def scrape_schedule(self):
         """Main execution function"""
 
         if not self.__login():
-            logging.error("Login failed. Terminating program.")
-            return False
+            logging.error("Login failed")
+            raise LoginError({"title": "Błąd uwierzytelniania", "message": "Niepoprawny identyfikator lub hasło."})
 
         html_content = self.__fetch_schedule()
         if not html_content:
-            logging.error("Failed to fetch schedule. Terminating program.")
-            return False
+            logging.error("Failed to fetch schedule")
+            raise ScheduleFetchError(
+                {"title: Błąd pobierania grafiku", "message: Z jakiegoś powodu nie udało się pobrać planu. :("})
 
         parser = ScheduleParser(html_content, self.schedule_config)
 
         # Calls the appropriate parsing method based on the schedule type from the config
         parser.parse_schedule()
 
-        parser.save_to_xlsx()
+        try:
+            parser.save_to_xlsx()
+        except PermissionError as e:
+            raise PermissionError({"title": e.args[0]["title"],
+                                   "message": e.args[0]["message"]})
+
         logging.info(f"Schedule saved to {self.schedule_config.output_filename}")
-        return True
+
