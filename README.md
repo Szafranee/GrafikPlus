@@ -16,7 +16,7 @@ Program do pobierania grafików z systemu CanalPlus z prostym interfejsem grafic
 
 ### Programiści
 ```bash
-git clone https://github.com/yourusername/grafikplus.git
+git clone https://github.com/Szafranee/GrafikPlus.git
 cd grafikplus
 pip install -r requirements.txt
 python schedule_scraper_gui.py
@@ -28,7 +28,7 @@ python schedule_scraper_gui.py
 - Automatyczne zapisywanie ostatnio użytej nazwy użytkownika
 - Możliwość wyboru lokalizacji i nazwy pliku wyjściowego
 - Tryb jasny/ciemny (zgodny z ustawieniami systemu)
-- 
+
 ## Wymagania systemowe
 - Windows 10/11
 - Dostęp do konta pracowniczego CanalPlus

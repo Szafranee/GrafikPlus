@@ -16,7 +16,7 @@ A simple GUI application for downloading work schedules from the CanalPlus inter
 
 ### Developers
 ```bash
-git clone
+git clone https://github.com/Szafranee/GrafikPlus.git
 cd grafikplus
 pip install -r requirements.txt
 python schedule_scraper_gui.py
