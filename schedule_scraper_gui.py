@@ -182,19 +182,19 @@ class ScheduleScraperGUI:
             radio_frame,
             text="Grafik montaży",
             variable=self.schedule_type,
-            value=0,
+            value=1,
             text_color=self.theme_colors["label_fg"]
         )
-        general_radio.pack(side="left", padx=(75, 5), pady=5)
+        general_radio.pack(side="right", padx=(5, 75), pady=5)
 
         personal_radio = ctk.CTkRadioButton(
             radio_frame,
             text="Grafik użytkownika",
             variable=self.schedule_type,
-            value=1,
+            value=0,
             text_color=self.theme_colors["label_fg"]
         )
-        personal_radio.pack(side="right", padx=(5, 75), pady=5)
+        personal_radio.pack(side="left", padx=(75, 5), pady=5)
 
     def create_output_frame(self, parent):
         """Creates the section for output file settings."""
@@ -328,7 +328,7 @@ class ScheduleScraperGUI:
             output_filename=self.filename_entry.get() if self.filename_entry.get().endswith(
                 ".xlsx") else self.filename_entry.get() + ".xlsx",
             selected_date=self.calendar.get_date(),
-            is_personal=self.schedule_type.get() == 1
+            is_personal=self.schedule_type.get() == 0
         )
 
         # Initialize the scraper
