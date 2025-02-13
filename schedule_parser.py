@@ -89,7 +89,7 @@ class ScheduleParser:
                 continue
 
             try:
-                program = program_cell.text.strip()
+                program_description = program_cell.text.strip()
 
                 time_cell = cells[4].find('tr', class_='text-bold')
                 if not time_cell:
@@ -101,12 +101,15 @@ class ScheduleParser:
                 duration = self.__calculate_duration(start_time, end_time)
                 editor = cells[11].text.strip()
 
+                # program_title and activity columns are always empty because that's what the "client" wanted
                 self.schedule_data.append({
                     'date': current_date,
-                    'program': program,
+                    'program_title': '', # Always empty
+                    'description': program_description,
+                    'activity': '', # Always empty
+                    'duration': duration,
                     'start_time': start_time,
                     'end_time': end_time,
-                    'duration': duration,
                     'editor': editor
                 })
             except AttributeError as e:
@@ -145,7 +148,7 @@ class ScheduleParser:
                 if not program_cell:
                     continue
 
-                program = program_cell.text.strip()
+                program_description = program_cell.text.strip()
 
                 time_cell = row.find('span', class_='text-bold')
                 if not time_cell:
@@ -160,12 +163,15 @@ class ScheduleParser:
                 end_time = times[1].strip().replace('\xa0', '')
                 duration = self.__calculate_duration(start_time, end_time)
 
+                # program_title and activity columns are always empty because that's what the "client" wanted
                 self.schedule_data.append({
                     'date': current_date,
-                    'program': program,
+                    'program_title': '', # Always empty
+                    'description': program_description,
+                    'activity': '', # Always empty
+                    'duration': duration,
                     'start_time': start_time,
                     'end_time': end_time,
-                    'duration': duration
                 })
             except (AttributeError, IndexError) as e:
                 logging.warning(f"Error parsing row: {e}")
@@ -182,8 +188,8 @@ class ScheduleParser:
 
     def save_to_xlsx(self) -> None:
         """Save parsed schedule to Excel file with proper Polish locale handling"""
-        headers = ['Data', 'Program', 'Od', 'Do', 'Godziny'] if self.schedule_config.is_personal \
-            else ['Data', 'Program', 'Od', 'Do', 'Godziny', 'Montażysta']
+        headers = ['Data', 'Tytuł programu', 'Opis', 'Czynność', 'Liczba godzin', 'Od', 'Do'] if self.schedule_config.is_personal \
+            else ['Data', 'Tytuł programu', 'Opis', 'Czynność', 'Liczba godzin', 'Od', 'Do', 'Montażysta']
 
         output_file_path = self.schedule_config.get_full_output_path()
         output_dir = Path(self.schedule_config.output_dir)
@@ -194,10 +200,12 @@ class ScheduleParser:
         for entry in self.schedule_data:
             row = [
                 entry['date'],
-                entry['program'],
+                entry['program_title'],
+                entry['description'],
+                entry['activity'],
+                float(entry['duration']),
                 entry['start_time'],
-                entry['end_time'],
-                float(entry['duration'])
+                entry['end_time']
             ]
             if not self.schedule_config.is_personal:
                 row.append(entry['editor'])
@@ -218,7 +226,7 @@ class ScheduleParser:
             worksheet = writer.sheets['Sheet1']
 
             # Formating the hours column
-            col_idx = headers.index('Godziny') + 1
+            col_idx = headers.index('Liczba godzin') + 1
             for row in range(2, len(df) + 2):
                 cell = worksheet.cell(row=row, column=col_idx)
                 # Format the cell as number with two decimal places
