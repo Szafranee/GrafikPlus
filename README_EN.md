@@ -50,7 +50,7 @@ python schedule_scraper_gui.py
 ## Technical Details
 
 ### Technologies
-- Python 3.8+
+- Python 3.12
 - CustomTkinter (UI)
 - BeautifulSoup4 (parsing)
 - Requests (data fetching)
