@@ -29,6 +29,10 @@ python schedule_scraper_gui.py
 - Możliwość wyboru lokalizacji i nazwy pliku wyjściowego
 - Tryb jasny/ciemny (zgodny z ustawieniami systemu)
 
+## Zrzuty ekranu
+![GrafikPlus Dark Mode](https://raw.githubusercontent.com/Szafranee/GrafikPlus/refs/heads/main/img/dark_mode.png)
+![GrafikPlus Light Mode](https://raw.githubusercontent.com/Szafranee/GrafikPlus/refs/heads/main/img/light_mode.png)
+
 ## Wymagania systemowe
 - Windows 10/11
 - Dostęp do konta pracowniczego CanalPlus

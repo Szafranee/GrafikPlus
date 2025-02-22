@@ -29,6 +29,10 @@ python schedule_scraper_gui.py
 - Customizable output location and filename
 - Light/dark mode (system-aware)
 
+## Screenshots
+![GrafikPlus Dark Mode](https://raw.githubusercontent.com/Szafranee/GrafikPlus/refs/heads/main/img/dark_mode.png)
+![GrafikPlus Light Mode](https://raw.githubusercontent.com/Szafranee/GrafikPlus/refs/heads/main/img/light_mode.png)
+
 ## System requirements
 - Windows 10/11
 - Access to a CanalPlus employee account
