@@ -62,6 +62,6 @@ grafikplus/
 ├── schedule_scraper_gui.py   # Main application file
 ├── schedule_scraper.py       # Scraping logic
 ├── schedule_parser.py        # HTML parsing
-├── config.py                # Configuration
-└── requirements.txt         # Dependencies
+├── config.py                 # Configuration
+└── requirements.txt          # Dependencies
 ```
