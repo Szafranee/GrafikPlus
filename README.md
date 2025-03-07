@@ -62,6 +62,6 @@ grafikplus/
 ├── schedule_scraper_gui.py   # Główny plik aplikacji
 ├── schedule_scraper.py       # Logika pobierania danych
 ├── schedule_parser.py        # Parsowanie HTML
-├── config.py                # Konfiguracja
-└── requirements.txt         # Zależności
+├── config.py                 # Konfiguracja
+└── requirements.txt          # Zależności
 ```
