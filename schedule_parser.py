@@ -186,6 +186,14 @@ class ScheduleParser:
         else:
             self.parse_general_schedule()
 
+    def get_parsed_data(self) -> List[Dict]:
+        """Return the parsed schedule data"""
+        return self.schedule_data
+
+    def set_parsed_data(self, data: List[Dict]) -> None:
+        """Set the parsed schedule data directly"""
+        self.schedule_data = data
+
     def save_to_xlsx(self) -> None:
         """Save parsed schedule to Excel file with proper Polish locale handling"""
         headers = ['Data', 'Tytuł programu', 'Opis', 'Czynność', 'Liczba godzin', 'Od', 'Do'] if self.schedule_config.is_personal \

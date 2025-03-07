@@ -12,7 +12,8 @@ class ScheduleConfig:
     output_filename: str
 
     # Schedule preferences
-    selected_date: str
+    start_date: str
+    end_date: str
     is_personal: bool
 
     def get_full_output_path(self) -> Path:

@@ -25,9 +25,20 @@ class ScheduleScraperGUI:
         self.scraper = None
         self.root = ctk.CTk()
         self.root.title("GrafikPlus")
-        self.root.geometry("600x750")
+
+        # Get Windows scaling factor and adjust window size
+        scaling_factor = self._get_windows_scaling_factor()
+        base_width = 600
+        base_height = 800
+
+        # Calculate adjusted dimensions
+        adjusted_width = int(base_width / scaling_factor)
+        adjusted_height = int(base_height / scaling_factor)
+
+        self.root.geometry(f"{adjusted_width}x{adjusted_height}")
         self.root.resizable(False, False)
         self.root.after(201, lambda: self.root.iconbitmap('favicon.ico'))
+
 
         # Set icon before any other GUI operations
         self.set_window_icon()
@@ -234,20 +245,44 @@ class ScheduleScraperGUI:
         self.filename_entry.insert(0, "grafik")
 
     def create_calendar_frame(self, parent):
-        """Creates the date selection section using a calendar widget."""
+        """Creates the date selection section using calendar widgets."""
         cal_container = ctk.CTkFrame(parent, corner_radius=8, fg_color=self.theme_colors["section_bg"])
         cal_container.pack(pady=(0, 5), fill="both", padx=10, expand=True)
 
         cal_label = ctk.CTkLabel(
             cal_container,
-            text="Wybierz dowolny dzień z DOCELOWEGO tygodnia:",
+            text="Wybierz zakres tygodni do pobrania grafiku:",
             font=ctk.CTkFont(size=16, weight="bold"),
             text_color=self.theme_colors["label_fg"]
         )
-        cal_label.pack(pady=(5, 0))
+        cal_label.pack(pady=(5, 5))
 
-        self.calendar = tkcalendar.Calendar(
-            cal_container,
+        # Dodaj etykiety dla kalendarzy
+        cal_labels_frame = ctk.CTkFrame(cal_container, fg_color=self.theme_colors["section_bg"])
+        cal_labels_frame.pack(fill="x", padx=10)
+
+        start_label = ctk.CTkLabel(
+            cal_labels_frame,
+            text="Tydzień POCZĄTKOWY:",
+            font=ctk.CTkFont(size=14),
+            text_color=self.theme_colors["label_fg"]
+        )
+        start_label.pack(side="left", padx=(50, 0))
+
+        end_label = ctk.CTkLabel(
+            cal_labels_frame,
+            text="Tydzień KOŃCOWY:",
+            font=ctk.CTkFont(size=14),
+            text_color=self.theme_colors["label_fg"]
+        )
+        end_label.pack(side="right", padx=(0, 50))
+
+        # Kalendarze
+        calendars_frame = ctk.CTkFrame(cal_container, fg_color=self.theme_colors["section_bg"])
+        calendars_frame.pack(fill="both", expand=True, padx=10, pady=5)
+
+        self.calendar_start_date = tkcalendar.Calendar(
+            calendars_frame,
             selectmode="day",
             year=datetime.now().year,
             month=datetime.now().month,
@@ -256,9 +291,33 @@ class ScheduleScraperGUI:
             foreground="white",
             selectbackground="#3d3d3d",
             selectforeground="white",
-            locale="pl_PL"
+            locale="pl_PL",
         )
-        self.calendar.pack(pady=5, padx=10, fill="both", expand=True)
+
+        self.calendar_end_date = tkcalendar.Calendar(
+            calendars_frame,
+            selectmode="day",
+            year=datetime.now().year,
+            month=datetime.now().month,
+            day=datetime.now().day,
+            background="#2e2e2e",
+            foreground="white",
+            selectbackground="#3d3d3d",
+            selectforeground="white",
+            locale="pl_PL",
+        )
+
+        self.calendar_start_date.pack(side="left", padx=(10, 5), fill="both", expand=True)
+        self.calendar_end_date.pack(side="right", padx=(5, 10), fill="both", expand=True)
+
+        # Dodaj informację o zakresie dat
+        info_label = ctk.CTkLabel(
+            cal_container,
+            text="Aplikacja pobierze grafiki dla wszystkich tygodni w wybranym zakresie dat.",
+            font=ctk.CTkFont(size=12, slant="italic"),
+            text_color=self.theme_colors["label_fg"]
+        )
+        info_label.pack(pady=(5, 10))
 
     def create_button_frame(self, parent):
         """Creates the section for action buttons."""
@@ -327,7 +386,8 @@ class ScheduleScraperGUI:
             output_dir=self.output_dir.get(),
             output_filename=self.filename_entry.get() if self.filename_entry.get().endswith(
                 ".xlsx") else self.filename_entry.get() + ".xlsx",
-            selected_date=self.calendar.get_date(),
+            start_date=self.calendar_start_date.get_date(),
+            end_date=self.calendar_end_date.get_date(),
             is_personal=self.schedule_type.get() == 0
         )
 
@@ -363,6 +423,24 @@ class ScheduleScraperGUI:
     def show_error_message(title: str, message: str):
         """Displays an error message."""
         messagebox.showerror(title, message)
+
+    @staticmethod
+    def _get_windows_scaling_factor() -> float:
+        """Get the Windows display scaling factor."""
+        try:
+            if os.name == 'nt':
+                import ctypes
+                user32 = ctypes.windll.user32
+                # Get the DPI for the primary monitor
+                dpi = user32.GetDpiForSystem()
+                # Convert DPI to scaling factor (96 is the base DPI for 100% scaling)
+                return dpi / 96.0
+            return 1.0
+        except Exception:
+            # Return 1.0 as fallback if something goes wrong
+            return 1.0
+
+
 
 
 if __name__ == "__main__":
