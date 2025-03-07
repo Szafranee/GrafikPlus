@@ -59,30 +59,53 @@ class ScheduleScraperGUI:
     def set_window_icon(self):
         """Set window icon with proper resource path handling for both development and compiled modes."""
         try:
-            # Set Windows taskbar icon
+            # Platform-specific icon setting
             if os.name == 'nt':
+                # Windows: set taskbar icon and use .ico file
                 import ctypes
                 myappid = 'company.grafikplus.schedule.1.0'
                 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+            elif sys.platform == 'darwin':
+                # macOS: use iconphoto with a .png image (it is recommended to use .icns for full applications,
+                # but for Tkinter we can use PhotoImage with .png)
+                pass  # Placeholder for macOS-specific processing below
 
-            # Get the icon path
+            # Determine the base path for the icon file
             if getattr(sys, 'frozen', False):
-                # Running as compiled exe
+                # Running as compiled executable
                 base_path = sys._MEIPASS
             else:
                 # Running from Python interpreter
                 base_path = os.path.dirname(os.path.abspath(__file__))
 
-            icon_path = os.path.join(base_path, 'favicon.ico')
-
-            if os.path.exists(icon_path):
-                self.root.iconbitmap(icon_path)
+            # Try to use platform-specific icon files:
+            if os.name == 'nt':
+                icon_path = os.path.join(base_path, 'favicon.ico')
+                if os.path.exists(icon_path):
+                    self.root.iconbitmap(icon_path)
+                else:
+                    print(f"Warning: Icon file not found at {icon_path}")
+            elif sys.platform == 'darwin':
+                # For macOS we assume a PNG icon exists (e.g. favicon.png)
+                icon_path = os.path.join(base_path, 'favicon.png')
+                if os.path.exists(icon_path):
+                    # Tkinter on macOS expects a PhotoImage for window icon
+                    img = tk.PhotoImage(file=icon_path)
+                    self.root.iconphoto(False, img)
+                else:
+                    print(f"Warning: Icon file not found at {icon_path}")
             else:
-                print(f"Warning: Icon file not found at {icon_path}")
+                # For other OSes, try default approach with iconbitmap
+                icon_path = os.path.join(base_path, 'favicon.ico')
+                if os.path.exists(icon_path):
+                    self.root.iconbitmap(icon_path)
+                else:
+                    print(f"Warning: Icon file not found at {icon_path}")
 
         except Exception as e:
             print(f"Warning: Could not set window icon: {e}")
             # Fail silently - the application can still run without an icon
+
 
     @staticmethod
     def _get_theme_colors():
